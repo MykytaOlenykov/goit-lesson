@@ -1,8 +1,10 @@
 const FilmsModel = require("../model/filmsModel");
 
 class FilmsService {
-  getAll = async () => {
-    const result = await FilmsModel.find({});
+  getAll = async (owner, adult = null) => {
+    const reqQuery = adult === null ? { owner } : { owner, adult };
+
+    const result = await FilmsModel.find(reqQuery);
     return result || null;
   };
 

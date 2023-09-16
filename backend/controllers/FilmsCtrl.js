@@ -2,16 +2,19 @@ const asyncHandler = require("express-async-handler");
 
 const FilmsModel = require("../model/filmsModel");
 const FilmsService = require("../services/FilmsService");
-const HttpError = require("../helpers/HttpError")
+const HttpError = require("../helpers/HttpError");
+const UserModel = require("../model/userModel");
 
 class FilmsCtrl {
   add = asyncHandler(async (req, res) => {
     const { title, adult } = req.body;
+    const { id } = req.user;
+
     if (!title || !adult) {
       res.status(400);
       throw new Error("Provide all required fields");
     }
-    const newFilm = await FilmsService.add({ ...req.body });
+    const newFilm = await FilmsService.add({ ...req.body, owner: id });
 
     if (newFilm) {
       return res.status(201).json({
@@ -19,15 +22,16 @@ class FilmsCtrl {
         data: newFilm,
       });
     }
-      
+
     res.status(400).json({
       code: 400,
       message: "Unable to add film",
     });
   });
 
-  getAll = asyncHandler(async (_, res) => {
-    const result = await FilmsService.getAll();
+  getAll = asyncHandler(async (req, res) => {
+    const { adult } = req.query;
+    const result = await FilmsService.getAll(req.user.id, adult);
 
     if (result) {
       return res.status(200).json({
@@ -47,9 +51,9 @@ class FilmsCtrl {
     const { id } = req.params;
     const result = await FilmsModel.findById(id);
     if (!result) {
-    //   res.status(404);
-    // throw new Error(`Not found with id: ${id}`);
-     throw HttpError(404, `Not found with id: ${id}`)
+      //   res.status(404);
+      // throw new Error(`Not found with id: ${id}`);
+      throw HttpError(404, `Not found with id: ${id}`);
     }
     res.status(200).json({
       code: 200,

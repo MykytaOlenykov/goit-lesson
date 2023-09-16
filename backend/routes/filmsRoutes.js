@@ -4,6 +4,8 @@ const { Router } = require("express");
 
 const filmsCtrl = require("../controllers/FilmsCtrl");
 const validateId = require("../midllewares/validateId");
+const rolesMidlleware = require("../midllewares/rolesMidlleware");
+const authMidlleware = require("../midllewares/authMidlleware");
 
 const filmsRouter = Router();
 
@@ -15,8 +17,13 @@ update film
 delete film
 */
 
+/* 
+["ADMIN", "MODERATOR", "SEO", "USER", "NIKITA"]
+*/
+
 filmsRouter.post(
   "/films",
+  authMidlleware,
   (req, res, next) => {
     console.log("runs Joi");
     next();
@@ -24,7 +31,12 @@ filmsRouter.post(
   filmsCtrl.add
 );
 
-filmsRouter.get("/films", filmsCtrl.getAll);
+filmsRouter.get(
+  "/films",
+  authMidlleware,
+  rolesMidlleware(["ADMIN", "MODERATOR", "USER"]),
+  filmsCtrl.getAll
+);
 
 filmsRouter.get("/films/:id", validateId, filmsCtrl.getById);
 

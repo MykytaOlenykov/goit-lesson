@@ -25,6 +25,10 @@ const filmSchema = new Schema(
       type: Boolean,
       required: [true, "DB: adult is required"],
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      default: null,
+    },
   },
   { timestamps: true, versionKey: false }
 );
