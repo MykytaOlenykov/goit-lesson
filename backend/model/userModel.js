@@ -15,6 +15,10 @@ const userSchema = new Schema(
       type: String,
       default: "Tolik",
     },
+    verifyEmail: {
+      type: Boolean,
+      default: false,
+    },
     token: {
       type: String,
       default: null,
